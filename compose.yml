@@ -4,7 +4,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: marketpulse
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ${MARKETPULSE_DB_USERNAME}
       POSTGRES_PASSWORD: ${MARKETPULSE_DB_PASSWORD}
     ports:
       - "5435:5432"
@@ -43,7 +43,7 @@ services:
 
     environment:
       MARKETPULSE_DB_URL: jdbc:postgresql://postgres:5432/marketpulse
-      MARKETPULSE_DB_USERNAME: postgres
+      MARKETPULSE_DB_USERNAME: ${MARKETPULSE_DB_USERNAME}
       MARKETPULSE_DB_PASSWORD: ${MARKETPULSE_DB_PASSWORD}
 
       MARKETPULSE_REDIS_HOST: redis
