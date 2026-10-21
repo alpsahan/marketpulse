@@ -1,3 +1,4 @@
+import { AuthLayout, Brand } from "../components/Brand";
 import { useState, type FormEvent } from "react";
 import {
     Link,
@@ -52,14 +53,14 @@ function LoginPage() {
     };
 
     return (
-        <div className="login-page">
+        <AuthLayout>
             <div className="login-card">
 
                 <div className="login-brand">
-                    <h1>MarketPulse</h1>
+                    <Brand />
 
                     <p>
-                        Cryptocurrency price alert platform
+                        Your personal market workspace
                     </p>
                 </div>
 
@@ -79,7 +80,7 @@ function LoginPage() {
 
                         <input
                             id="email"
-                            type="email"
+                            type="email" autoComplete="email" placeholder="you@example.com"
                             value={email}
                             onChange={(event) =>
                                 setEmail(event.target.value)
@@ -95,7 +96,7 @@ function LoginPage() {
 
                         <div className="password-wrapper">
                             <input
-                                id="password"
+                                id="password" autoComplete="current-password"
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
                                 value={password}
@@ -155,7 +156,7 @@ function LoginPage() {
                     </div>
 
                     {error && (
-                        <div className="login-error">
+                        <div role="alert" className="login-error">
                             {error}
                         </div>
                     )}
@@ -187,7 +188,7 @@ function LoginPage() {
 
 
             </div>
-        </div>
+        </AuthLayout>
     );
 }
 

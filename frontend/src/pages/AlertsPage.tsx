@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AlertsPage.css";
+import { Brand } from "../components/Brand";
 import { getMarketPrice } from "../services/marketService";
 import type { MarketPrice } from "../types/market";
 
@@ -277,50 +278,20 @@ function AlertsPage() {
 
     return (
         <div className="alerts-page">
-            <div className="alerts-container">
+            <a
+                className="skip-link"
+                href="#dashboard"
+            >
+                Skip to dashboard
+            </a>
 
-                <header className="page-header">
-                    <div>
-                        <h1>MarketPulse</h1>
-                        <p>Manage your cryptocurrency price alerts</p>
-                    </div>
+            <header className="topbar">
+                <div className="topbar-inner">
+                    <Brand />
 
-                    {marketError && (
-                        <div className="error-message">
-                            {marketError}
-                        </div>
-                    )}
-
-                    <div className="market-grid">
-                        {marketPrices.map((market) => (
-                            <div
-                                className="market-card"
-                                key={market.symbol}
-                            >
-                                <div className="market-symbol">
-                                    {market.symbol.replace(
-                                        "USDT",
-                                        ""
-                                    )}
-                                </div>
-
-                                <div className="market-pair">
-                                    {market.symbol}
-                                </div>
-
-                                <div className="market-price">
-                                    $
-                                    {market.price.toLocaleString(
-                                        "en-US",
-                                        {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                        }
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <span className="nav-current">
+                        Overview
+                    </span>
 
                     <button
                         type="button"
@@ -328,125 +299,362 @@ function AlertsPage() {
                         onClick={handleLogout}
                     >
                         Logout
+                        <span aria-hidden="true">
+                            ↗
+                        </span>
                     </button>
-                </header>
+                </div>
+            </header>
 
-                <div className="dashboard-grid">
+            <main
+                className="alerts-container"
+                id="dashboard"
+            >
+                <header className="page-header">
+                    <div>
+                        <span className="eyebrow">
+                            MARKET WORKSPACE
+                        </span>
 
-                    <div className="card">
-                        <h3>
-                            {editingAlertId !== null
-                                ? "Edit Alert"
-                                : "Create Alert"}
-                        </h3>
+                        <h1>
+                            Market overview
+                            <span className="heading-dot">
+                                .
+                            </span>
+                        </h1>
 
-                        <form onSubmit={handleSubmitAlert}>
-                            <div className="form-row">
-
-                                <input
-                                    type="text"
-                                    placeholder="BTCUSDT"
-                                    value={symbol}
-                                    onChange={(event) =>
-                                        setSymbol(event.target.value)
-                                    }
-                                    required
-                                />
-
-                                <input
-                                    type="number"
-                                    placeholder="Target price"
-                                    value={targetPrice}
-                                    onChange={(event) =>
-                                        setTargetPrice(event.target.value)
-                                    }
-                                    required
-                                />
-
-                                <select
-                                    value={condition}
-                                    onChange={(event) =>
-                                        setCondition(
-                                            event.target.value as AlertCondition
-                                        )
-                                    }
-                                >
-                                    <option value="ABOVE">
-                                        Above
-                                    </option>
-
-                                    <option value="BELOW">
-                                        Below
-                                    </option>
-                                </select>
-
-                                {editingAlertId !== null && (
-                                    <select
-                                        value={active ? "true" : "false"}
-                                        onChange={(event) =>
-                                            setActive(
-                                                event.target.value === "true"
-                                            )
-                                        }
-                                    >
-                                        <option value="true">
-                                            Active
-                                        </option>
-
-                                        <option value="false">
-                                            Inactive
-                                        </option>
-                                    </select>
-                                )}
-
-                                <button
-                                    type="submit"
-                                    className="primary-button"
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting
-                                        ? "Saving..."
-                                        : editingAlertId !== null
-                                            ? "Update"
-                                            : "Create"}
-                                </button>
-
-                                {editingAlertId !== null && (
-                                    <button
-                                        type="button"
-                                        className="secondary-button"
-                                        onClick={handleCancelEdit}
-                                    >
-                                        Cancel
-                                    </button>
-                                )}
-
-                            </div>
-                        </form>
+                        <p>
+                            Keep an eye on the market. Make your next move count.
+                        </p>
                     </div>
 
-                    <div className="card">
-                        <h3>Filter Alerts</h3>
+                    <span className="refresh-note">
+                        <span className="status-dot" />
+                        Prices refresh every 10s
+                    </span>
+                </header>
 
-                        <div className="form-row">
+                {marketError && (
+                    <div
+                        className="error-message"
+                        role="alert"
+                    >
+                        {marketError}
+                    </div>
+                )}
+
+                <section
+                    className="market-grid"
+                    aria-label="Market prices"
+                >
+                    {marketPrices.length === 0 ? (
+                        ["BTC", "ETH", "BNB"].map((ticker) => (
+                            <div
+                                className="market-card"
+                                key={ticker}
+                            >
+                                <span className="market-symbol">
+                                    {ticker}
+
+                                    <span className="market-pair">
+                                        / USDT
+                                    </span>
+                                </span>
+
+                                <div
+                                    className={
+                                        marketError
+                                            ? "market-unavailable"
+                                            : "skeleton"
+                                    }
+                                >
+                                    {marketError ? (
+                                        "Price unavailable"
+                                    ) : (
+                                        <span className="sr-only">
+                                            Loading price
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        marketPrices.map((market) => {
+                            const ticker =
+                                market.symbol.replace(
+                                    "USDT",
+                                    ""
+                                );
+
+                            const names: Record<string, string> = {
+                                BTC: "Bitcoin",
+                                ETH: "Ethereum",
+                                BNB: "BNB"
+                            };
+
+                            return (
+                                <article
+                                    className="market-card"
+                                    key={market.symbol}
+                                >
+                                    <div className="market-card-top">
+                                        <div className="asset-identity">
+                                            <span
+                                                className={`coin coin-${ticker.toLowerCase()}`}
+                                                aria-hidden="true"
+                                            >
+                                                {ticker === "BTC"
+                                                    ? "₿"
+                                                    : ticker === "ETH"
+                                                        ? "Ξ"
+                                                        : "◇"}
+                                            </span>
+
+                                            <div>
+                                                <div className="market-symbol">
+                                                    {names[ticker] || ticker}
+                                                </div>
+
+                                                <div className="market-pair">
+                                                    {ticker} / USDT
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <span className="quote-label">
+                                            SPOT PRICE
+                                        </span>
+                                    </div>
+
+                                    <div className="market-price">
+                                        $
+                                        {market.price.toLocaleString(
+                                            "en-US",
+                                            {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }
+                                        )}
+
+                                        <span>
+                                            USDT
+                                        </span>
+                                    </div>
+
+                                    <div className="market-card-footer">
+                                        <span>
+                                            Market price
+                                        </span>
+
+                                        <span className="market-ticker">
+                                            {market.symbol}
+                                        </span>
+                                    </div>
+                                </article>
+                            );
+                        })
+                    )}
+                </section>
+
+                <section
+                    className="card create-card"
+                    aria-labelledby="create-title"
+                >
+                    <div className="section-heading">
+                        <div
+                            className="section-icon"
+                            aria-hidden="true"
+                        >
+                            ＋
+                        </div>
+
+                        <div>
+                            <h2 id="create-title">
+                                {editingAlertId !== null
+                                    ? "Edit alert"
+                                    : "Create a price alert"}
+                            </h2>
+
+                            <p>
+                                {editingAlertId !== null
+                                    ? "Adjust your target and update this alert."
+                                    : "Set a target. Keep your next opportunity in sight."}
+                            </p>
+                        </div>
+
+                        <span className="section-caption">
+                            YOUR STRATEGY, YOUR RULES
+                        </span>
+                    </div>
+
+                    <form
+                        onSubmit={handleSubmitAlert}
+                        className="create-form"
+                    >
+                        <label className="field">
+                            Trading pair
 
                             <input
                                 type="text"
-                                placeholder="Symbol"
+                                placeholder="e.g. BTCUSDT"
+                                value={symbol}
+                                onChange={(event) =>
+                                    setSymbol(event.target.value)
+                                }
+                                required
+                            />
+                        </label>
+
+                        <label className="field">
+                            Target price
+
+                            <input
+                                type="number"
+                                placeholder="Enter target price"
+                                value={targetPrice}
+                                onChange={(event) =>
+                                    setTargetPrice(
+                                        event.target.value
+                                    )
+                                }
+                                required
+                            />
+                        </label>
+
+                        <label className="field">
+                            Trigger condition
+
+                            <select
+                                value={condition}
+                                onChange={(event) =>
+                                    setCondition(
+                                        event.target.value as AlertCondition
+                                    )
+                                }
+                            >
+                                <option value="ABOVE">
+                                    Price goes above
+                                </option>
+
+                                <option value="BELOW">
+                                    Price goes below
+                                </option>
+                            </select>
+                        </label>
+
+                        {editingAlertId !== null && (
+                            <label className="field">
+                                Status
+
+                                <select
+                                    value={
+                                        active
+                                            ? "true"
+                                            : "false"
+                                    }
+                                    onChange={(event) =>
+                                        setActive(
+                                            event.target.value === "true"
+                                        )
+                                    }
+                                >
+                                    <option value="true">
+                                        Active
+                                    </option>
+
+                                    <option value="false">
+                                        Inactive
+                                    </option>
+                                </select>
+                            </label>
+                        )}
+
+                        <div className="form-actions">
+                            <button
+                                type="submit"
+                                className="primary-button"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting
+                                    ? "Saving..."
+                                    : editingAlertId !== null
+                                        ? "Update alert"
+                                        : "+ Create alert"}
+                            </button>
+
+                            {editingAlertId !== null && (
+                                <button
+                                    type="button"
+                                    className="secondary-button"
+                                    onClick={handleCancelEdit}
+                                >
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                    </form>
+                </section>
+
+                <section
+                    className="table-card"
+                    aria-labelledby="alerts-title"
+                >
+                    <div className="table-heading">
+                        <div>
+                            <span className="eyebrow">
+                                ALERT MANAGEMENT
+                            </span>
+
+                            <h2 id="alerts-title">
+                                Your price alerts
+                            </h2>
+
+                            <p>
+                                Fine-tune your targets and stay in control.
+                            </p>
+                        </div>
+
+                        <span className="count-pill">
+                            {alerts.length} on this page
+                        </span>
+                    </div>
+
+                    <form
+                        className="filter-row"
+                        aria-label="Filter alerts"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            void handleFilter();
+                        }}
+                    >
+                        <label className="field">
+                            Symbol
+
+                            <input
+                                type="text"
+                                placeholder="Search symbol..."
                                 value={filterSymbol}
                                 onChange={(event) =>
-                                    setFilterSymbol(event.target.value)
+                                    setFilterSymbol(
+                                        event.target.value
+                                    )
                                 }
                             />
+                        </label>
+
+                        <label className="field">
+                            Status
 
                             <select
                                 value={filterActive}
                                 onChange={(event) =>
-                                    setFilterActive(event.target.value)
+                                    setFilterActive(
+                                        event.target.value
+                                    )
                                 }
                             >
                                 <option value="">
-                                    All Status
+                                    All statuses
                                 </option>
 
                                 <option value="true">
@@ -457,15 +665,21 @@ function AlertsPage() {
                                     Inactive
                                 </option>
                             </select>
+                        </label>
+
+                        <label className="field">
+                            Condition
 
                             <select
                                 value={filterCondition}
                                 onChange={(event) =>
-                                    setFilterCondition(event.target.value)
+                                    setFilterCondition(
+                                        event.target.value
+                                    )
                                 }
                             >
                                 <option value="">
-                                    All Conditions
+                                    All conditions
                                 </option>
 
                                 <option value="ABOVE">
@@ -476,156 +690,267 @@ function AlertsPage() {
                                     Below
                                 </option>
                             </select>
+                        </label>
+
+                        <label className="field">
+                            Sort by
 
                             <select
                                 value={sortOption}
                                 onChange={(event) =>
-                                    setSortOption(event.target.value)
+                                    setSortOption(
+                                        event.target.value
+                                    )
                                 }
                             >
                                 <option value="">
-                                    Default Sort
+                                    Default order
                                 </option>
 
                                 <option value="targetPrice,asc">
-                                    Price ↑
+                                    Price: low to high
                                 </option>
 
                                 <option value="targetPrice,desc">
-                                    Price ↓
+                                    Price: high to low
                                 </option>
 
                                 <option value="symbol,asc">
-                                    Symbol A-Z
+                                    Symbol: A–Z
                                 </option>
 
                                 <option value="symbol,desc">
-                                    Symbol Z-A
+                                    Symbol: Z–A
                                 </option>
                             </select>
+                        </label>
 
+                        <div className="form-actions">
                             <button
-                                type="button"
-                                className="primary-button"
-                                onClick={handleFilter}
+                                type="submit"
+                                className="filter-button"
                             >
-                                Filter
+                                Apply filters
                             </button>
 
                             <button
                                 type="button"
-                                className="secondary-button"
+                                className="clear-button"
                                 onClick={handleClearFilters}
                             >
-                                Clear
+                                Reset
                             </button>
-
                         </div>
-                    </div>
-                </div>
+                    </form>
 
-                {error && (
-                    <div className="error-message">
-                        {error}
-                    </div>
-                )}
-
-                <div className="table-card">
+                    {error && (
+                        <div
+                            className="error-message table-error"
+                            role="alert"
+                        >
+                            {error}
+                        </div>
+                    )}
 
                     {isLoadingAlerts ? (
-                        <div className="empty-state">
-                            Loading alerts...
+                        <div
+                            className="empty-state"
+                            role="status"
+                        >
+                            <span className="loader" />
+
+                            <h3>
+                                Loading your alerts
+                            </h3>
+
+                            <p>
+                                Getting your latest price targets.
+                            </p>
                         </div>
                     ) : alerts.length === 0 ? (
                         <div className="empty-state">
-                            No alerts found.
+                            <span
+                                className="empty-icon"
+                                aria-hidden="true"
+                            >
+                                ◎
+                            </span>
+
+                            <h3>
+                                No alerts to display
+                            </h3>
+
+                            <p>
+                                Create your first price alert above, or adjust your filters.
+                            </p>
                         </div>
                     ) : (
-                        <>
-                            {/* mevcut table + pagination */}
-                        </>
-                    )} : (
-                    <>
-                        <table className="alert-table">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Target Price</th>
-                                    <th>Condition</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
+                        <div
+                            className="table-scroll"
+                            tabIndex={0}
+                            role="region"
+                            aria-label="Price alerts table"
+                        >
+                            <table className="alert-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            Trading pair
+                                        </th>
 
-                            <tbody>
-                                {alerts.map((alert) => (
-                                    <tr key={alert.id}>
+                                        <th scope="col">
+                                            Target price
+                                        </th>
 
-                                        <td>
-                                            <strong>
-                                                {alert.symbol}
-                                            </strong>
-                                        </td>
+                                        <th scope="col">
+                                            Condition
+                                        </th>
 
-                                        <td>
-                                            {alert.targetPrice}
-                                        </td>
+                                        <th scope="col">
+                                            Status
+                                        </th>
 
-                                        <td>
-                                            {alert.condition}
-                                        </td>
-
-                                        <td>
-                                            <span
-                                                className={
-                                                    alert.active
-                                                        ? "status status-active"
-                                                        : "status status-inactive"
-                                                }
-                                            >
-                                                {alert.active
-                                                    ? "Active"
-                                                    : "Inactive"}
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <div className="actions">
-
-                                                <button
-                                                    type="button"
-                                                    className="edit-button"
-                                                    onClick={() =>
-                                                        handleEditAlert(alert)
-                                                    }
-                                                >
-                                                    Edit
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    className="danger-button"
-                                                    disabled={deletingAlertId === alert.id}
-                                                    onClick={() =>
-                                                        handleDeleteAlert(alert.id)
-                                                    }
-                                                >
-                                                    {deletingAlertId === alert.id
-                                                        ? "Deleting..."
-                                                        : "Delete"}
-                                                </button>
-
-                                            </div>
-                                        </td>
-
+                                        <th
+                                            scope="col"
+                                            className="actions-heading"
+                                        >
+                                            Actions
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
 
-                        {totalPages > 0 && (
-                            <div className="pagination">
+                                <tbody>
+                                    {alerts.map((alert) => (
+                                        <tr
+                                            key={alert.id}
+                                            className={
+                                                editingAlertId === alert.id
+                                                    ? "editing-row"
+                                                    : undefined
+                                            }
+                                        >
+                                            <td>
+                                                <div className="table-asset">
+                                                    <span
+                                                        className="asset-avatar"
+                                                        aria-hidden="true"
+                                                    >
+                                                        {alert.symbol.slice(
+                                                            0,
+                                                            1
+                                                        )}
+                                                    </span>
 
+                                                    <div>
+                                                        <strong>
+                                                            {alert.symbol}
+                                                        </strong>
+
+                                                        <span className="asset-subtitle">
+                                                            Price alert #{alert.id}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td className="price-cell">
+                                                {alert.targetPrice.toLocaleString(
+                                                    "en-US",
+                                                    {
+                                                        maximumFractionDigits: 8
+                                                    }
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                <span
+                                                    className={`condition condition-${alert.condition.toLowerCase()}`}
+                                                >
+                                                    <span aria-hidden="true">
+                                                        {alert.condition === "ABOVE"
+                                                            ? "↗"
+                                                            : "↘"}
+                                                    </span>
+
+                                                    {" "}
+                                                    {alert.condition}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <span
+                                                    className={
+                                                        alert.active
+                                                            ? "status status-active"
+                                                            : "status status-inactive"
+                                                    }
+                                                >
+                                                    <span className="status-dot" />
+
+                                                    {alert.active
+                                                        ? "Active"
+                                                        : "Inactive"}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <div className="actions">
+                                                    <button
+                                                        type="button"
+                                                        className="edit-button"
+                                                        onClick={() =>
+                                                            handleEditAlert(
+                                                                alert
+                                                            )
+                                                        }
+                                                        aria-label={`Edit alert ${alert.id}`}
+                                                    >
+                                                        Edit
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="danger-button"
+                                                        disabled={
+                                                            deletingAlertId === alert.id
+                                                        }
+                                                        onClick={() =>
+                                                            handleDeleteAlert(
+                                                                alert.id
+                                                            )
+                                                        }
+                                                        aria-label={`Delete alert ${alert.id}`}
+                                                    >
+                                                        {deletingAlertId === alert.id
+                                                            ? "Deleting..."
+                                                            : "Delete"}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {totalPages > 0 && (
+                        <nav
+                            className="pagination"
+                            aria-label="Alerts pagination"
+                        >
+                            <span>
+                                Page{" "}
+                                <strong>
+                                    {currentPage + 1}
+                                </strong>
+                                {" "}of{" "}
+                                <strong>
+                                    {totalPages}
+                                </strong>
+                            </span>
+
+                            <div>
                                 <button
                                     type="button"
                                     disabled={
@@ -633,15 +958,13 @@ function AlertsPage() {
                                         isLoadingAlerts
                                     }
                                     onClick={() =>
-                                        loadAlerts(currentPage - 1)
+                                        loadAlerts(
+                                            currentPage - 1
+                                        )
                                     }
                                 >
-                                    Previous
+                                    ← Previous
                                 </button>
-
-                                <span>
-                                    Page {currentPage + 1} / {totalPages}
-                                </span>
 
                                 <button
                                     type="button"
@@ -650,20 +973,34 @@ function AlertsPage() {
                                         isLoadingAlerts
                                     }
                                     onClick={() =>
-                                        loadAlerts(currentPage + 1)
+                                        loadAlerts(
+                                            currentPage + 1
+                                        )
                                     }
                                 >
-                                    Next
+                                    Next →
                                 </button>
-
                             </div>
-                        )}
-                    </>
-                    )
+                        </nav>
+                    )}
+                </section>
 
-                </div>
+                <footer className="dashboard-footer">
+                    <span>
+                        MarketPulse
+                        {" "}
+                        <span className="footer-divider">
+                            /
+                        </span>
+                        {" "}
+                        Cryptocurrency intelligence
+                    </span>
 
-            </div>
+                    <span>
+                        Built for a market that never sleeps.
+                    </span>
+                </footer>
+            </main>
         </div>
     );
 }

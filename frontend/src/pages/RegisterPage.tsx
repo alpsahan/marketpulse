@@ -1,3 +1,4 @@
+import { AuthLayout, Brand } from "../components/Brand";
 import {
     useState,
     type FormEvent
@@ -65,14 +66,14 @@ function RegisterPage() {
     };
 
     return (
-        <div className="register-page">
+        <AuthLayout>
             <div className="register-card">
 
                 <div className="register-brand">
-                    <h1>MarketPulse</h1>
+                    <Brand />
 
                     <p>
-                        Cryptocurrency price alert platform
+                        Your personal market workspace
                     </p>
                 </div>
 
@@ -92,7 +93,7 @@ function RegisterPage() {
 
                         <input
                             id="email"
-                            type="email"
+                            type="email" autoComplete="email" placeholder="you@example.com"
                             value={email}
                             onChange={(event) =>
                                 setEmail(event.target.value)
@@ -109,7 +110,7 @@ function RegisterPage() {
                         <div className="register-password-wrapper">
 
                             <input
-                                id="password"
+                                id="password" autoComplete="new-password"
                                 type={
                                     showPassword
                                         ? "text"
@@ -178,7 +179,7 @@ function RegisterPage() {
                         <div className="register-password-wrapper">
 
                             <input
-                                id="confirmPassword"
+                                id="confirmPassword" autoComplete="new-password"
                                 type={
                                     showConfirmPassword
                                         ? "text"
@@ -240,7 +241,7 @@ function RegisterPage() {
                     </div>
 
                     {error && (
-                        <div className="register-error">
+                        <div role="alert" className="register-error">
                             {error}
                         </div>
                     )}
@@ -266,7 +267,7 @@ function RegisterPage() {
                 </div>
 
             </div>
-        </div>
+        </AuthLayout>
     );
 }
 
