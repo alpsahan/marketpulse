@@ -23,3 +23,19 @@ export interface CreatePriceAlertRequest {
     targetPrice: number;
     condition: AlertCondition;
 }
+
+export interface UpdatePriceAlertRequest {
+    symbol?: string;
+    targetPrice?: number;
+    condition?: AlertCondition;
+    active?: boolean;
+}
+
+export interface AlertFilters {
+    symbol?: string;
+    active?: boolean;
+    condition?: AlertCondition;
+    page?: number;
+    size?: number;
+    sort?: string;
+}

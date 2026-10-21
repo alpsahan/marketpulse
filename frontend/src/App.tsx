@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import AlertsPage from "./pages/AlertsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
@@ -19,6 +20,10 @@ function App() {
         />
 
         <Route path="/" element={<Navigate to="/login" />} />
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
       </Routes>
     </BrowserRouter>
   );

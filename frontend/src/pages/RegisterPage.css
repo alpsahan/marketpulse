@@ -1,0 +1,156 @@
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 24px;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 420px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 36px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.register-brand {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.register-brand h1 {
+    margin: 0;
+    font-size: 34px;
+    color: #f8fafc;
+}
+
+.register-brand p {
+    margin: 8px 0 0;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.register-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.register-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.register-field label {
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.register-field input {
+    width: 100%;
+    background: #0f172a;
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 15px;
+}
+
+.register-field input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.register-password-wrapper {
+    position: relative;
+}
+
+.register-password-wrapper input {
+    padding-right: 44px;
+}
+
+.register-password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    padding: 0;
+
+    color: #94a3b8;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.register-password-toggle:hover {
+    color: #e2e8f0;
+}
+
+.register-button {
+    width: 100%;
+    padding: 12px;
+
+    background: #2563eb;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.register-button:hover {
+    background: #1d4ed8;
+}
+
+.register-error {
+    padding: 10px 12px;
+
+    background: #7f1d1d;
+    color: #fecaca;
+
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+.register-login {
+    margin-top: 24px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.register-login a {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+.register-login a:hover {
+    text-decoration: underline;
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}

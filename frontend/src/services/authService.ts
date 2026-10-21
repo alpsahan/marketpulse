@@ -1,24 +1,54 @@
-import type { LoginRequest, LoginResponse } from "../types/auth";
+import type {
+    LoginRequest,
+    LoginResponse,
+    RegisterRequest,
+    UserResponse
+} from "../types/auth";
 
-const API_URL = "http://localhost:8080/api/v1/auth";
+const BASE_URL = "http://localhost:8080";
 
 export async function login(
     request: LoginRequest
 ): Promise<LoginResponse> {
-
-    const response = await fetch(`${API_URL}/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request),
-    });
-
-    const data = await response.json();
+    const response = await fetch(
+        `${BASE_URL}/api/v1/auth/login`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(request),
+        }
+    );
 
     if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+        throw new Error("Invalid email or password");
     }
 
-    return data;
+    return response.json();
+}
+
+export async function register(
+    request: RegisterRequest
+): Promise<UserResponse> {
+    const response = await fetch(
+        `${BASE_URL}/api/v1/users`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(request),
+        }
+    );
+
+    if (!response.ok) {
+        const data = await response.json();
+
+        throw new Error(
+            data.message || "Registration failed"
+        );
+    }
+
+    return response.json();
 }
