@@ -1,8 +1,12 @@
 target
 .git
+.github
 .gitignore
 .env
 .settings
 .classpath
 .project
 .idea
+.vscode
+frontend
+*.pem

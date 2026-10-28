@@ -5,11 +5,14 @@ import type {
     UserResponse
 } from "../types/auth";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ??
+    "http://localhost:8080";
 
 export async function login(
     request: LoginRequest
 ): Promise<LoginResponse> {
+
     const response = await fetch(
         `${BASE_URL}/api/v1/auth/login`,
         {
@@ -31,6 +34,7 @@ export async function login(
 export async function register(
     request: RegisterRequest
 ): Promise<UserResponse> {
+
     const response = await fetch(
         `${BASE_URL}/api/v1/users`,
         {

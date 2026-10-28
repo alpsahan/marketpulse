@@ -1,0 +1,58 @@
+services:
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+
+  kafka:
+    image: apache/kafka:4.2.2
+    restart: unless-stopped
+
+
+  backend:
+    image: ${ECR_REGISTRY}/marketpulse-backend:${IMAGE_TAG}
+    restart: unless-stopped
+
+    environment:
+      MARKETPULSE_DB_URL: ${MARKETPULSE_DB_URL}
+      MARKETPULSE_DB_USERNAME: ${MARKETPULSE_DB_USERNAME}
+      MARKETPULSE_DB_PASSWORD: ${MARKETPULSE_DB_PASSWORD}
+
+      MARKETPULSE_REDIS_HOST: redis
+      MARKETPULSE_REDIS_PORT: 6379
+
+      MARKETPULSE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+      JWT_SECRET: ${JWT_SECRET}
+
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_APP_PASSWORD: ${MAIL_APP_PASSWORD}
+
+    expose:
+      - "8080"
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+      kafka:
+        condition: service_started
+
+
+  frontend:
+    image: ${ECR_REGISTRY}/marketpulse-frontend:${IMAGE_TAG}
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+
+    depends_on:
+      backend:
+        condition: service_started
