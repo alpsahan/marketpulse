@@ -9,6 +9,7 @@ on:
     branches:
       - main
 
+
 jobs:
 
   backend:
@@ -23,6 +24,7 @@ jobs:
       MAIL_APP_PASSWORD: test-password
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -46,6 +48,7 @@ jobs:
         working-directory: frontend
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -64,3 +67,90 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+
+  deploy:
+    name: Deploy to AWS
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    needs:
+      - backend
+      - frontend
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      AWS_REGION: eu-central-1
+      ECR_REGISTRY: 659681154227.dkr.ecr.eu-central-1.amazonaws.com
+      EC2_INSTANCE_ID: i-047dd85033f23c967
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::659681154227:role/MarketPulseGitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend image
+        run: |
+          docker build \
+            -t "${ECR_REGISTRY}/marketpulse-backend:${GITHUB_SHA}" \
+            .
+
+          docker push \
+            "${ECR_REGISTRY}/marketpulse-backend:${GITHUB_SHA}"
+
+      - name: Build and push frontend image
+        run: |
+          docker build \
+            -t "${ECR_REGISTRY}/marketpulse-frontend:${GITHUB_SHA}" \
+            ./frontend
+
+          docker push \
+            "${ECR_REGISTRY}/marketpulse-frontend:${GITHUB_SHA}"
+
+      - name: Deploy to EC2 with SSM
+        run: |
+          cat > ssm-params.json <<EOF
+          {
+            "commands": [
+              "runuser -u ubuntu -- git -C /home/ubuntu/marketpulse fetch origin main",
+              "runuser -u ubuntu -- git -C /home/ubuntu/marketpulse checkout -B main origin/main",
+              "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}",
+              "cd /home/ubuntu/marketpulse && ECR_REGISTRY=${ECR_REGISTRY} IMAGE_TAG=${GITHUB_SHA} docker compose -f compose.prod.yml pull",
+              "cd /home/ubuntu/marketpulse && ECR_REGISTRY=${ECR_REGISTRY} IMAGE_TAG=${GITHUB_SHA} docker compose -f compose.prod.yml up -d --remove-orphans",
+              "docker image prune -f"
+            ]
+          }
+          EOF
+
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "${EC2_INSTANCE_ID}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy MarketPulse ${GITHUB_SHA}" \
+            --parameters file://ssm-params.json \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "SSM Command ID: ${COMMAND_ID}"
+
+          aws ssm wait command-executed \
+            --command-id "${COMMAND_ID}" \
+            --instance-id "${EC2_INSTANCE_ID}"
+
+          aws ssm get-command-invocation \
+            --command-id "${COMMAND_ID}" \
+            --instance-id "${EC2_INSTANCE_ID}" \
+            --query '{Status:Status,Stdout:StandardOutputContent,Stderr:StandardErrorContent}'
