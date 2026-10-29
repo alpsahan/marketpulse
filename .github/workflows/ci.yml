@@ -131,7 +131,7 @@ jobs:
               "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}",
               "cd /home/ubuntu/marketpulse && ECR_REGISTRY=${ECR_REGISTRY} IMAGE_TAG=${GITHUB_SHA} docker compose -f compose.prod.yml pull",
               "cd /home/ubuntu/marketpulse && ECR_REGISTRY=${ECR_REGISTRY} IMAGE_TAG=${GITHUB_SHA} docker compose -f compose.prod.yml up -d --remove-orphans",
-              "healthy=0; i=1; while [ \$i -le 30 ]; do if curl -fsS http://localhost/actuator/health | grep -q 'UP'; then echo 'MarketPulse is healthy'; healthy=1; break; fi; echo 'Waiting for MarketPulse...'; sleep 2; i=\$((i+1)); done; if [ \$healthy -ne 1 ]; then echo 'Health check failed'; exit 1; fi",
+              "healthy=0; i=1; while [ \$i -le 30 ]; do if curl -fsS --resolve marketpulse-alp.duckdns.org:443:127.0.0.1 https://marketpulse-alp.duckdns.org/actuator/health | grep -q 'UP'; then echo 'MarketPulse HTTPS is healthy'; healthy=1; break; fi; echo 'Waiting for MarketPulse HTTPS...'; sleep 2; i=\$((i+1)); done; if [ \$healthy -ne 1 ]; then echo 'HTTPS health check failed'; exit 1; fi",
               "docker image prune -f"
             ]
           }
@@ -181,3 +181,18 @@ jobs:
             --command-id "${COMMAND_ID}" \
             --instance-id "${EC2_INSTANCE_ID}" \
             --query '{Status:Status,Stdout:StandardOutputContent,Stderr:StandardErrorContent}'
+
+      - name: Verify public HTTPS endpoint
+        run: |
+          for i in $(seq 1 12); do
+            if curl -fsS https://marketpulse-alp.duckdns.org/actuator/health | grep -q 'UP'; then
+              echo "Public HTTPS endpoint is healthy"
+              exit 0
+            fi
+
+            echo "Waiting for public HTTPS endpoint..."
+            sleep 5
+          done
+
+          echo "Public HTTPS verification failed"
+          exit 1
