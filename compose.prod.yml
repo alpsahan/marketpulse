@@ -50,6 +50,10 @@ services:
     image: ${ECR_REGISTRY}/marketpulse-frontend:${IMAGE_TAG}
     restart: unless-stopped
 
+    volumes:
+      - /var/www/certbot:/var/www/certbot:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+
     ports:
       - "80:80"
 
