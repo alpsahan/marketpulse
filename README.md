@@ -286,7 +286,21 @@ The project includes:
 
 ## Screenshots
 
-Screenshots of the application dashboard, authentication pages, alerts, and CI/CD pipeline will be added here.
+### Login
+
+![MarketPulse Login](docs/screenshots/login.png)
+
+### Market Overview
+
+![MarketPulse Dashboard](docs/screenshots/dashboard.png)
+
+### Price Alerts
+
+![MarketPulse Alerts](docs/screenshots/alerts.png)
+
+### CI/CD Pipeline
+
+![MarketPulse CI/CD Pipeline](docs/screenshots/cicd-pipeline.png)
 
 ---
 
